@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<script type="text/javascript" src="js/caat.js"></script>
+    <script type="text/javascript" src="js/screen.js"></script>
+    <script type="text/javascript" src="js/const.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/data/proto.js"></script>
+    <script type="text/javascript" src="js/scenes/gamescene.js"></script>
+    <title>Spacemaths</title>
+</head>
+<body style="margin:0; padding:0; background: white;">
+<div id="i" style="position: absolute; left: 50%; top: 50%;"></div>
+
+
+<script>
+    var director = null;
+    window.addEventListener(
+            'load',
+            function() {
+                var director = new CAAT.Foundation.Director().
+                        initialize(Screen.NativeWidth(), Screen.NativeHeight()).
+                        setClear(false);
+                var utils = new Utils(director);
+                document.getElementById('i').appendChild(director.canvas);
+                //change scale onresize
+                if (Screen.AutoScale())
+                {
+                    director.enableResizeEvents(CAAT.Foundation.Director.RESIZE_PROPORTIONAL);
+                }
+                //redraw only changed screen elements
+                //director.setClear( CAAT.Foundation.Director.CLEAR_DIRTY_RECTS );
+
+                new CAAT.Module.Preloader.ImagePreloader().loadImages(
+                        [
+                            {id:'bg_space1',    url:'files/img/bg/background.png'},
+                            {id:'ship_1',       url:'files/img/ship/3.png'},
+                            {id:'ship_2',       url:'files/img/ship/spaceship_02.png'},
+                            {id:'healthbar',    url:'files/img/ui/healthbar.png'},
+                            {id:'gun_1',        url: 'files/img/weapons/gun1.png'},
+                            {id:'gun_2',        url: 'files/img/weapons/machinegun_01.png'},
+                            {id:'blast_1',      url: 'files/img/bullets/blast1.png'},
+                            {id:'bullet_1',     url:'files/img/bullets/railgun bullet 02.png'},
+                            {id:'bullet_2',     url:'files/img/bullets/machinegun_bullet_01.png'},
+                            {id:'rocket_1',     url:'files/img/bullets/rocket.png'}
+                        ],
+                        function( counter, images ) {
+                            if ( counter==images.length ) {
+                                director.setImagesCache(images);
+                                __scene1(director);
+                            }
+                        }
+                );
+                CAAT.loop(CONST.FPS);
+            },
+            false
+    );
+</script>
+</body>
+</html>

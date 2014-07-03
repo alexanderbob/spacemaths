@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="CAAT" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/js/caat.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/js/caat.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>
