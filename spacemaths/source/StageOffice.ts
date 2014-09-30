@@ -22,8 +22,6 @@
         engineer: Engineer;
         paper: Phaser.Sprite;
         computer: Phaser.Sprite;
-        spaceKey: Phaser.Key;
-        shadow: Phaser.Rectangle;
         task_generator: TaskGenerator;
         //isEngineerBusy: boolean = false;
         correctAnswers: number = 0;
@@ -33,7 +31,7 @@
         create() {
             this.correctAnswers = 0;
             this.isTimeOut = false;
-            this.task_generator = new TaskGenerator;
+            this.task_generator = TaskGenerator.getInstance();
             var wall = <HTMLImageElement>this.game.cache.getImage('wall'),
                 floor = <HTMLImageElement>this.game.cache.getImage('floor'),
                 battery = <HTMLImageElement>this.game.cache.getImage('battery'),
@@ -76,10 +74,6 @@
 
             this.taskSheet = new OfficeTaskSheet(this, this.answerClicked, this.paperMovedOut);
 
-            var sizes = Utils.getInstance().getGameSizes();
-            this.shadow = new Phaser.Rectangle(0, 0, sizes.w, sizes.h);
-            this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
             //clock initialization here
             this.clock.resetTimeOut(StageOffice.STAGE_LENGTH, this.timeIsOutCallback);
             this.timer = this.game.time.create(false);
@@ -121,8 +115,6 @@
             if (this.isTimeOut)
             {
                 this.timer.stop();
-                this.timer.removeAll();
-                this.timer.destroy();
                 console.log("Correct answers: " + this.correctAnswers);
                 (<Game>this.game).transitions.to('StageLevelSelect');
             }
@@ -142,6 +134,9 @@
                 this.engineer.move_in();
                 this.door.play('open');
             }*/
+        }
+        shutdown() {
+            
         }
     }
 }

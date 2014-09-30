@@ -1,6 +1,4 @@
 ﻿module Spacemaths {
-    enum EngineerActionState { IDLE, MOVE_IN, MOVE_OUT };
-
     export class Engineer extends Phaser.Sprite {
         private action_state = EngineerActionState.IDLE;
         private move_in_coords = { x: 0, y: 0 };

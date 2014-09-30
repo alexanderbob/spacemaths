@@ -6,32 +6,62 @@
         button_mars: Phaser.Button;
 
         create() {
-            var height = this.game.world.height;
+            var height = this.game.world.height,
+                storage = GameStorage.getInstance(),
+                isMoonEnabled = storage.hasLevelAccess(GameLevels.Moon),
+                isMarsEnabled = storage.hasLevelAccess(GameLevels.Mars);
+
             this.button_space = this.add.button(
                 this.game.world.centerX, 0.1 * height,
                 'buttons_level', this.selectSpace, this, 0, 0, 2, 0);
-            this.button_moon = this.add.button(
-                this.game.world.centerX, 0.4 * height,
-                'buttons_level', this.selectMoon, this, 3, 3, 5, 3);
-            this.button_mars = this.add.button(
-                this.game.world.centerX, 0.7 * height,
-                'buttons_level', this.selectMars, this, 6, 6, 8, 6);
+            if (isMoonEnabled)
+            {
+                this.button_moon = this.add.button(
+                    this.game.world.centerX, 0.4 * height,
+                    'buttons_level', this.selectMoon, this, 3, 3, 5, 3);
+            }
+            else
+            {
+                this.button_moon = this.add.button(
+                    this.game.world.centerX, 0.4 * height,
+                    'buttons_level', this.purchaseMoonAccess, this, 4, 4, 4, 4);
+            }
+            if (isMarsEnabled)
+            {
+                this.button_mars = this.add.button(
+                    this.game.world.centerX, 0.7 * height,
+                    'buttons_level', this.selectMars, this, 6, 6, 8, 6);
+            }
+            else
+            {
+                this.button_mars = this.add.button(
+                    this.game.world.centerX, 0.7 * height,
+                    'buttons_level', this.purchaseMarsAccess, this, 7, 7, 7, 7);
+            }
             this.button_space.anchor.x = 0.5;
             this.button_mars.anchor.x = 0.5;
             this.button_moon.anchor.x = 0.5;
         }
 
-        selectSpace() {
+        private purchaseMoonAccess() {
+            alert('Purchase moon access here!');
+        }
+
+        private purchaseMarsAccess() {
+            alert('Purchase mars access here!');
+        }
+
+        private selectSpace() {
             //(<Game>this.game).transitions.to('StageOffice');
             this.startStage();
         }
 
-        selectMoon() {
+        private selectMoon() {
             //(<Game>this.game).transitions.to('StageOffice');
             this.startStage();
         }
 
-        selectMars() {
+        private selectMars() {
             //(<Game>this.game).transitions.to('StageOffice');
             this.startStage();
         }

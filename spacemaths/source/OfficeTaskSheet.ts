@@ -1,12 +1,4 @@
 ﻿module Spacemaths {
-    export interface TaskSheetAnswerClicked {
-        (office: StageOffice, is_correct: boolean): void;
-    }
-
-    export interface TaskSheetPaperMovedOut {
-        (office: StageOffice): void;
-    }
-
     export class OfficeTaskSheet {
         private group: Phaser.Group;
         private stage: StageOffice;

@@ -13,7 +13,7 @@
             this.state.add('Preloader', Preloader, false);
             this.state.add('MainMenu', MainMenu, false);
             this.state.add('StageOffice', StageOffice, false);
-            this.state.add('StageDayMenu', StageDay, false);
+            this.state.add('StageDayResults', StageDayResults, false);
             this.state.add('StageLevelSelect', StageLevelSelect, false);
             this.state.start('Boot');
 

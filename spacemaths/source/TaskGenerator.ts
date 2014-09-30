@@ -1,15 +1,4 @@
 ﻿module Spacemaths {
-    export enum MathOperation {
-        Plus, Minus, Multiply, Divide
-    }
-
-    export interface EngineerTask {
-        values: number[];
-        operations: MathOperation[];
-        answers: number[];
-        correct_answer_index: number;
-    }
-
     export class TaskGenerator {
         private static instance: TaskGenerator = null;
         constructor() {

@@ -1,5 +1,5 @@
 ﻿module Spacemaths {
-    export class StageDay extends Phaser.Stage {
+    export class StageDayResults extends Phaser.Stage {
         private buttonNext: Phaser.Button;
         private buttonCancel: Phaser.Button;
         private text: Phaser.Text;

@@ -56,11 +56,13 @@
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="source\Boot.ts" />
+    <TypeScriptCompile Include="source\Declarations.ts" />
     <TypeScriptCompile Include="source\Game.ts" />
+    <TypeScriptCompile Include="source\GameStorage.ts" />
     <TypeScriptCompile Include="source\OfficeClock.ts" />
     <TypeScriptCompile Include="source\OfficePicture.ts" />
     <TypeScriptCompile Include="source\OfficeTaskSheet.ts" />
-    <TypeScriptCompile Include="source\StageDay.ts" />
+    <TypeScriptCompile Include="source\StageDayResults.ts" />
     <TypeScriptCompile Include="source\StageLevelSelect.ts" />
     <TypeScriptCompile Include="source\StageOffice.ts" />
     <TypeScriptCompile Include="source\MainMenu.ts" />

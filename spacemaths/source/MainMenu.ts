@@ -28,8 +28,9 @@
             this.fadeOut();
         }
         fadeOut() {
-            var tween = this.add.tween(this.playButton).to({ y: 0 }, 2000, Phaser.Easing.Linear.None, true);
-            tween.onComplete.add(this.startGame, this);
+            this.add.tween(this.playButton)
+                .to({ y: this.game.world.height + this.playButton.height }, 1000, Phaser.Easing.Linear.None, true)
+                .onComplete.add(this.startGame, this);
         }
         startGame() {
             //this.game.state.start('StageOffice', true, false);
