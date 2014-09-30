@@ -1,16 +1,23 @@
 ﻿module Spacemaths {
+    export interface TaskSheetAnswerClicked {
+        (office: StageOffice, is_correct: boolean): void;
+    }
+
+    export interface TaskSheetPaperMovedOut {
+        (office: StageOffice): void;
+    }
 
     export class OfficeTaskSheet {
         private group: Phaser.Group;
-        private stage: Phaser.State;
+        private stage: StageOffice;
         private style: Object;
-        private answerClicked: Function;
+        private answerClicked: (office: StageOffice, correct: boolean) => void;
         private paperMovedOut: Function;
         private paper_size: { w: number; h: number; };
 
         private static FONT_SIZE = 108;
 
-        constructor(stage: StageOffice, answerClicked: Function, paperMovedOut: Function) {
+        constructor(stage: StageOffice, answerClicked: TaskSheetAnswerClicked, paperMovedOut: TaskSheetPaperMovedOut) {
             this.stage = stage;
             this.group = stage.game.add.group();
             this.style = { font: OfficeTaskSheet.FONT_SIZE + "px Arial", fill: "#000000", align: "center" };

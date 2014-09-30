@@ -20,10 +20,10 @@
         }
         public doShatter() {
             var tween = this.stage.game.add.tween(this.group)
-                .to({ angle: 3 }, 200, Phaser.Easing.Linear.None, true)
-                .to({ angle: 1 }, 250, Phaser.Easing.Linear.None, true)
-                .to({ angle: 2 }, 300, Phaser.Easing.Linear.None, true)
-                .to({ angle: 0 }, 400, Phaser.Easing.Linear.None, true)
+                .to({ rotation: Math.PI / 60 }, 200, Phaser.Easing.Linear.None, true)
+                .to({ rotation: Math.PI / 180 }, 250, Phaser.Easing.Linear.None, true)
+                .to({ rotation: Math.PI / 90 }, 300, Phaser.Easing.Linear.None, true)
+                .to({ rotation: 0 }, 400, Phaser.Easing.Linear.None, true)
             ;
         }
     }

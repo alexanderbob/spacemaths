@@ -18,18 +18,20 @@
             else
             {
                 //  Same goes for mobile settings.
+                this.game.scale.forcePortrait = true;
             }            
 
-            this.game.scale.forcePortrait = true;
             this.game.scale.minWidth = 480;
             this.game.scale.minHeight = 800;
             this.game.scale.maxHeight = 1920;
             this.game.scale.maxWidth = 1080;
             this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            this.game.scale.setShowAll();
+            //this.game.scale.setShowAll();
             this.game.scale.pageAlignHorizontally = true;
             this.game.scale.pageAlignVertically = true;
             this.game.scale.refresh();
+            this.game.scale.setScreenSize(true);
+            this.game.scale.setExactFit();
 
             /*var ow = parseInt(this.game.canvas.style.width, 10);
             var oh = parseInt(this.game.canvas.style.height, 10);
@@ -50,7 +52,7 @@
 
             var self = this;
             window.addEventListener('resize', function (event) {
-                self.game.scale.setShowAll();
+                self.game.scale.setExactFit();
                 self.game.scale.refresh();
             });
         }

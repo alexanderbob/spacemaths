@@ -47,6 +47,7 @@
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="source\Boot.ts" />
     <TypeScriptCompile Include="source\Game.ts" />
+    <TypeScriptCompile Include="source\OfficeClock.ts" />
     <TypeScriptCompile Include="source\OfficePicture.ts" />
     <TypeScriptCompile Include="source\OfficeTaskSheet.ts" />
     <TypeScriptCompile Include="source\StageOffice.ts" />

@@ -1,13 +1,13 @@
 ﻿module Spacemaths {
 
     export class StageOffice extends Phaser.State {
+        private static STAGE_LENGTH = 60000;
+        private static ENGINEER_WAIT_TIME = 500;
+
         taskSheet: OfficeTaskSheet;
         picture: OfficePicture;
+        clock: OfficeClock;
         door: Phaser.Sprite;
-        clock: {
-            base: Phaser.Sprite;
-            arrow: Phaser.Sprite;
-        };
         hands: {
             left: Phaser.Sprite;
             right: Phaser.Sprite;
@@ -25,11 +25,13 @@
         spaceKey: Phaser.Key;
         shadow: Phaser.Rectangle;
         task_generator: TaskGenerator;
-        engineer_is_busy: boolean = false;
+        //isEngineerBusy: boolean = false;
         correctAnswers: number = 0;
+        isTimeOut: boolean = false;
+        timer: Phaser.Timer;
+
         create() {
             this.task_generator = new TaskGenerator;
-
             var wall = <HTMLImageElement>this.game.cache.getImage('wall'),
                 floor = <HTMLImageElement>this.game.cache.getImage('floor'),
                 battery = <HTMLImageElement>this.game.cache.getImage('battery'),
@@ -45,12 +47,13 @@
             }
             this.picture = new OfficePicture(this, 'wall_picture_frame', 'wall_picture', {x: 320, y: 241}, 133);
 
-            this.clock = {
+            this.clock = new OfficeClock(this, 'table_clock', 'table_clock_arrow', { x: 824, y: 1372 });
+            /*this.clock = {
                 base: this.add.sprite(824, 1372, 'table_clock'),
                 //-217 из-за anchor.x == 1
                 arrow: this.add.sprite(824 + 217, 1372, 'table_clock_arrow')
             }
-            this.clock.arrow.anchor.x = 1;
+            this.clock.arrow.anchor.x = 1;*/
 
             var eng = <HTMLImageElement>this.game.cache.getImage('engineer');
             this.engineer = new Engineer(this.game, 710, wall_h - eng.height, this.engineer_moved_in, this.engineer_moved_out, this);
@@ -73,6 +76,18 @@
             var sizes = Utils.getInstance().getGameSizes();
             this.shadow = new Phaser.Rectangle(0, 0, sizes.w, sizes.h);
             this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+            //clock initialization here
+            this.clock.resetTimeOut(StageOffice.STAGE_LENGTH, this.timeIsOutCallback);
+            this.timer = this.game.time.create(false);
+            this.timer.loop(StageOffice.ENGINEER_WAIT_TIME, this.sendEngineer, this);
+            this.timer.start();
+        }
+        sendEngineer() {
+            this.timer.pause();
+            this.engineer.exists = true;
+            this.engineer.move_in();
+            this.door.play('open');
         }
         answerClicked(self: StageOffice, is_correct: boolean) {
             if (is_correct)
@@ -82,9 +97,12 @@
         paperMovedOut(self: StageOffice) {
             self.engineer.move_out();
         }
-        render() {
-
+        timeIsOutCallback(self: StageOffice) {
+            self.isTimeOut = true;
         }
+        /*render() {
+
+        }*/
         engineer_moved_in() {
             var task = this.task_generator.generateTask();
             this.taskSheet.loadTask(task);
@@ -94,18 +112,34 @@
         }
         engineer_moved_out() {
             this.engineer.exists = false;
-            this.engineer_is_busy = false;
+            //this.isEngineerBusy = false;
             this.door.play('closed');
             this.picture.doShatter();
+            if (this.isTimeOut)
+            {
+                this.timer.stop();
+                this.timer.removeAll();
+                this.timer.destroy();
+            }
+            else
+            {
+                this.timer.resume();
+            }
+        }
+        render() {
+            if (this.isTimeOut)
+            {
+                this.game.debug.text('Correct answers: ' + this.correctAnswers, 32, 32);
+            }
         }
         update() {
-            if (this.spaceKey.isDown && this.engineer_is_busy === false)
+            /*if (this.spaceKey.isDown && this.isEngineerBusy === false)
             {
-                this.engineer_is_busy = true;
+                this.isEngineerBusy = true;
                 this.engineer.exists = true;
                 this.engineer.move_in();
                 this.door.play('open');
-            }
+            }*/
         }
     }
 }

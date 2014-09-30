@@ -4997,6 +4997,7 @@ declare module Phaser {
         order(): void;
         pause(): void;
         remove(event: Phaser.TimerEvent): boolean;
+        removeAll(): void;
         repeat(delay: number, repeatCount: number, callback: Function, callbackContext: Object, ...args: any[]): Phaser.TimerEvent;
         resume(): void;
         sortHandler(a: any, b: any): number;
