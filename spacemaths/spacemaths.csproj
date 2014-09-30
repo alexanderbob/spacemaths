@@ -30,6 +30,15 @@
     <Content Include="assets\level1.png" />
     <Content Include="assets\loader.png" />
     <Content Include="assets\logo.png" />
+    <Content Include="assets\man\head1-480p.png" />
+    <Content Include="assets\man\head2-480p.png" />
+    <Content Include="assets\man\head3-480p.png" />
+    <Content Include="assets\man\pants1-480p.png" />
+    <Content Include="assets\man\pants2-480p.png" />
+    <Content Include="assets\man\pants3-480p.png" />
+    <Content Include="assets\man\suit1-480p.png" />
+    <Content Include="assets\man\suit2-480p.png" />
+    <Content Include="assets\man\suit3-480p.png" />
     <Content Include="assets\paper.png" />
     <Content Include="assets\phaser-logo-small.png" />
     <Content Include="assets\picture.png" />
@@ -40,6 +49,7 @@
     <Content Include="assets\titlepage.jpg" />
     <Content Include="assets\wall.png" />
     <Content Include="index.html" />
+    <Content Include="source\phaser-state-transition.min.js" />
     <Content Include="source\phaser.min.js" />
     <Content Include="web.config" />
   </ItemGroup>
@@ -50,6 +60,8 @@
     <TypeScriptCompile Include="source\OfficeClock.ts" />
     <TypeScriptCompile Include="source\OfficePicture.ts" />
     <TypeScriptCompile Include="source\OfficeTaskSheet.ts" />
+    <TypeScriptCompile Include="source\StageDay.ts" />
+    <TypeScriptCompile Include="source\StageLevelSelect.ts" />
     <TypeScriptCompile Include="source\StageOffice.ts" />
     <TypeScriptCompile Include="source\MainMenu.ts" />
     <TypeScriptCompile Include="source\phaser.d.ts" />

@@ -29,18 +29,21 @@ var Spacemaths;
                 //this.scale.pageAlignHorizontally = true;
             } else {
                 //  Same goes for mobile settings.
+                this.game.scale.forcePortrait = true;
             }
 
-            this.game.scale.forcePortrait = true;
             this.game.scale.minWidth = 480;
             this.game.scale.minHeight = 800;
             this.game.scale.maxHeight = 1920;
             this.game.scale.maxWidth = 1080;
             this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-            this.game.scale.setShowAll();
+
+            //this.game.scale.setShowAll();
             this.game.scale.pageAlignHorizontally = true;
             this.game.scale.pageAlignVertically = true;
             this.game.scale.refresh();
+            this.game.scale.setScreenSize(true);
+            this.game.scale.setExactFit();
 
             /*var ow = parseInt(this.game.canvas.style.width, 10);
             var oh = parseInt(this.game.canvas.style.height, 10);
@@ -54,64 +57,18 @@ var Spacemaths;
             document.getElementById("content").style.width = window.innerWidth + "px";
             document.getElementById("content").style.height = window.innerHeight + "px";//The css for body includes 1px top margin, I believe this is the cause for this -1
             document.getElementById("content").style.overflow = "hidden";*/
-            this.game.physics.enable(this, Phaser.Physics.ARCADE);
+            //this.game.physics.enable(this, Phaser.Physics.ARCADE);
             this.game.state.start('Preloader', true, false);
 
             var self = this;
             window.addEventListener('resize', function (event) {
-                self.game.scale.setShowAll();
+                self.game.scale.setExactFit();
                 self.game.scale.refresh();
             });
         };
         return Boot;
     })(Phaser.State);
     Spacemaths.Boot = Boot;
-})(Spacemaths || (Spacemaths = {}));
-var Spacemaths;
-(function (Spacemaths) {
-    var EngineerActionState;
-    (function (EngineerActionState) {
-        EngineerActionState[EngineerActionState["IDLE"] = 0] = "IDLE";
-        EngineerActionState[EngineerActionState["MOVE_IN"] = 1] = "MOVE_IN";
-        EngineerActionState[EngineerActionState["MOVE_OUT"] = 2] = "MOVE_OUT";
-    })(EngineerActionState || (EngineerActionState = {}));
-    ;
-
-    var Engineer = (function (_super) {
-        __extends(Engineer, _super);
-        function Engineer(game, x, y, move_in_callback, move_out_callback, stage_office) {
-            _super.call(this, game, x, y, 'engineer', 0);
-            this.action_state = 0 /* IDLE */;
-            this.move_in_coords = { x: 512, y: 512 };
-            this.move_out_coords = { x: 710, y: 232 };
-            this.move_epsylon = 5;
-            this.move_in_callback = move_in_callback;
-            this.move_out_callback = move_out_callback;
-            this.stage_office = stage_office;
-
-            //this.anchor.setTo(0.5, 0);
-            this.game.physics.arcade.enableBody(this);
-            game.add.existing(this);
-        }
-        Engineer.prototype.update = function () {
-        };
-        Engineer.prototype.move_in = function () {
-            var tween = this.game.add.tween(this.body).to({
-                x: this.move_in_coords.x,
-                y: this.move_in_coords.y
-            }, 1000, Phaser.Easing.Linear.None, true);
-            tween.onComplete.add(this.move_in_callback, this.stage_office);
-        };
-        Engineer.prototype.move_out = function () {
-            var tween = this.game.add.tween(this.body).to({
-                x: this.move_out_coords.x,
-                y: this.move_out_coords.y
-            }, 1000, Phaser.Easing.Linear.None, true);
-            tween.onComplete.add(this.move_out_callback, this.stage_office);
-        };
-        return Engineer;
-    })(Phaser.Sprite);
-    Spacemaths.Engineer = Engineer;
 })(Spacemaths || (Spacemaths = {}));
 var Spacemaths;
 (function (Spacemaths) {
@@ -125,10 +82,10 @@ var Spacemaths;
 
             this.state.add('Boot', Spacemaths.Boot, false);
             this.state.add('Preloader', Spacemaths.Preloader, false);
-
-            //this.state.add('MainMenu', MainMenu, false);
+            this.state.add('MainMenu', Spacemaths.MainMenu, false);
             this.state.add('StageOffice', Spacemaths.StageOffice, false);
-
+            this.state.add('StageDayMenu', Spacemaths.StageDay, false);
+            this.state.add('StageLevelSelect', Spacemaths.StageLevelSelect, false);
             this.state.start('Boot');
         }
         return Game;
@@ -137,35 +94,46 @@ var Spacemaths;
 })(Spacemaths || (Spacemaths = {}));
 var Spacemaths;
 (function (Spacemaths) {
-    //не используется
-    var MainMenu = (function (_super) {
-        __extends(MainMenu, _super);
-        function MainMenu() {
-            _super.apply(this, arguments);
+    var OfficeClock = (function () {
+        function OfficeClock(stage, base_img_key, arrow_img_key, xy) {
+            this.callback_time = 0;
+            var b_img = stage.game.cache.getImage(base_img_key), a_img = stage.game.cache.getImage(arrow_img_key);
+            this.base = stage.add.sprite(xy.x, xy.y, base_img_key);
+            var x = xy.x + a_img.width + 0.2 * b_img.width, y = xy.y + 0.5 * a_img.height + 0.375 * b_img.height;
+            this.arrow = stage.add.sprite(x, y, arrow_img_key);
+            this.arrow.anchor.x = 1;
+            this.arrow.anchor.y = 0.5;
+            this.stage = stage;
         }
-        MainMenu.prototype.create = function () {
-            this.background = this.add.sprite(0, 0, 'titlepage');
-            this.background.alpha = 0;
-
-            this.logo = this.add.sprite(this.world.centerX, -300, 'logo');
-            this.logo.anchor.setTo(0.5, 0.5);
-
-            this.add.tween(this.background).to({ alpha: 1 }, 2000, Phaser.Easing.Bounce.InOut, true);
-            this.add.tween(this.logo).to({ y: 220 }, 2000, Phaser.Easing.Elastic.Out, true, 2000);
-
-            this.input.onDown.addOnce(this.fadeOut, this);
+        OfficeClock.prototype.resetTimeOut = function (new_time_ms, callback) {
+            this.timeout_callback = callback;
+            this.callback_time = new_time_ms;
+            this.arrow.angle = 0;
+            this.timer_elapsed_time = 0;
+            if (this.timer) {
+                this.timer.stop();
+                this.timer.removeAll();
+                this.timer.destroy();
+            }
+            this.timer = this.stage.game.time.create(false);
+            this.timer_tick_time = new_time_ms / OfficeClock.TICKS_NUMBER;
+            this.timer.loop(this.timer_tick_time, this.timerEvent, this);
+            this.timer.start();
         };
-        MainMenu.prototype.fadeOut = function () {
-            this.add.tween(this.background).to({ alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
-            var tween = this.add.tween(this.logo).to({ y: 800 }, 2000, Phaser.Easing.Linear.None, true);
-            tween.onComplete.add(this.startGame, this);
+
+        OfficeClock.prototype.timerEvent = function () {
+            this.timer_elapsed_time += this.timer_tick_time;
+            this.arrow.rotation = 1.5 * Math.PI * (this.timer_elapsed_time / this.callback_time);
+            if (this.timer_elapsed_time >= this.callback_time) {
+                this.timeout_callback(this.stage);
+                this.timer.removeAll();
+                this.timer.destroy();
+            }
         };
-        MainMenu.prototype.startGame = function () {
-            this.game.state.start('Level1', true, false);
-        };
-        return MainMenu;
-    })(Phaser.State);
-    Spacemaths.MainMenu = MainMenu;
+        OfficeClock.TICKS_NUMBER = 45;
+        return OfficeClock;
+    })();
+    Spacemaths.OfficeClock = OfficeClock;
 })(Spacemaths || (Spacemaths = {}));
 var Spacemaths;
 (function (Spacemaths) {
@@ -186,7 +154,7 @@ var Spacemaths;
         OfficePicture.prototype.update = function () {
         };
         OfficePicture.prototype.doShatter = function () {
-            var tween = this.stage.game.add.tween(this.group).to({ angle: 3 }, 200, Phaser.Easing.Linear.None, true).to({ angle: 1 }, 250, Phaser.Easing.Linear.None, true).to({ angle: 2 }, 300, Phaser.Easing.Linear.None, true).to({ angle: 0 }, 400, Phaser.Easing.Linear.None, true);
+            var tween = this.stage.game.add.tween(this.group).to({ rotation: Math.PI / 60 }, 200, Phaser.Easing.Linear.None, true).to({ rotation: Math.PI / 180 }, 250, Phaser.Easing.Linear.None, true).to({ rotation: Math.PI / 90 }, 300, Phaser.Easing.Linear.None, true).to({ rotation: 0 }, 400, Phaser.Easing.Linear.None, true);
         };
         return OfficePicture;
     })();
@@ -286,12 +254,297 @@ var Spacemaths;
 })(Spacemaths || (Spacemaths = {}));
 var Spacemaths;
 (function (Spacemaths) {
+    var StageDay = (function (_super) {
+        __extends(StageDay, _super);
+        function StageDay() {
+            _super.apply(this, arguments);
+        }
+        StageDay.prototype.create = function () {
+        };
+        return StageDay;
+    })(Phaser.Stage);
+    Spacemaths.StageDay = StageDay;
+})(Spacemaths || (Spacemaths = {}));
+var Spacemaths;
+(function (Spacemaths) {
+    var StageLevelSelect = (function (_super) {
+        __extends(StageLevelSelect, _super);
+        function StageLevelSelect() {
+            _super.apply(this, arguments);
+        }
+        StageLevelSelect.prototype.create = function () {
+            var height = this.game.world.height;
+            this.button_space = this.add.button(this.game.world.centerX, 0.1 * height, 'buttons_level', this.selectSpace, this, 0, 0, 2, 0);
+            this.button_moon = this.add.button(this.game.world.centerX, 0.4 * height, 'buttons_level', this.selectMoon, this, 3, 3, 5, 3);
+            this.button_mars = this.add.button(this.game.world.centerX, 0.7 * height, 'buttons_level', this.selectMars, this, 6, 6, 8, 6);
+            this.button_space.anchor.x = 0.5;
+            this.button_mars.anchor.x = 0.5;
+            this.button_moon.anchor.x = 0.5;
+        };
+
+        StageLevelSelect.prototype.selectSpace = function () {
+            //(<Game>this.game).transitions.to('StageOffice');
+            this.startStage();
+        };
+
+        StageLevelSelect.prototype.selectMoon = function () {
+            //(<Game>this.game).transitions.to('StageOffice');
+            this.startStage();
+        };
+
+        StageLevelSelect.prototype.selectMars = function () {
+            //(<Game>this.game).transitions.to('StageOffice');
+            this.startStage();
+        };
+
+        StageLevelSelect.prototype.startStage = function () {
+            this.stage.game.add.tween(this.button_space).to({
+                x: -this.button_space.width
+            }, 500, Phaser.Easing.Linear.None, true);
+            this.stage.game.add.tween(this.button_moon).to({
+                x: this.game.world.width + this.button_moon.width
+            }, 500, Phaser.Easing.Linear.None, true);
+            this.stage.game.add.tween(this.button_mars).to({
+                y: this.game.world.height
+            }, 500, Phaser.Easing.Linear.None, true).onComplete.add(this.loadOffice, this);
+        };
+
+        StageLevelSelect.prototype.loadOffice = function () {
+            this.game.state.start('StageOffice', true, false);
+        };
+        return StageLevelSelect;
+    })(Phaser.State);
+    Spacemaths.StageLevelSelect = StageLevelSelect;
+})(Spacemaths || (Spacemaths = {}));
+var Spacemaths;
+(function (Spacemaths) {
+    var StageOffice = (function (_super) {
+        __extends(StageOffice, _super);
+        function StageOffice() {
+            _super.apply(this, arguments);
+            //isEngineerBusy: boolean = false;
+            this.correctAnswers = 0;
+            this.isTimeOut = false;
+        }
+        StageOffice.prototype.create = function () {
+            this.correctAnswers = 0;
+            this.isTimeOut = false;
+            this.task_generator = new Spacemaths.TaskGenerator;
+            var wall = this.game.cache.getImage('wall'), floor = this.game.cache.getImage('floor'), battery = this.game.cache.getImage('battery'), door = this.game.cache.getImage('door'), wall_h = wall.height, floor_h = floor.height;
+            this.background = {
+                wall: this.add.sprite(0, 0, 'wall'),
+                floor: this.add.sprite(0, wall_h, 'floor'),
+                table: this.add.sprite(0, wall_h + floor_h, 'table'),
+                battery: this.add.sprite(128, wall_h - battery.height, 'battery'),
+                door_back: this.add.sprite(710, wall_h - door.height + 68, 'door_back', 0)
+            };
+            this.picture = new Spacemaths.OfficePicture(this, 'wall_picture_frame', 'wall_picture', { x: 320, y: 241 }, 133);
+
+            this.clock = new Spacemaths.OfficeClock(this, 'table_clock', 'table_clock_arrow', { x: 824, y: 1372 });
+
+            var eng = this.game.cache.getImage('engineer'), x = 710 + eng.width * 0.5, y = wall_h - eng.height * 0.5;
+            this.engineer = new Spacemaths.Engineer(this.game, x, y, this.engineer_moved_in, this.engineer_moved_out, this);
+            this.engineer.exists = false;
+            this.engineer.z = 3;
+            this.engineer.setMoveOutXY(x, y);
+            this.engineer.setMoveInXY(this.game.world.centerX, this.game.world.centerY - 0.5 * eng.height);
+
+            this.computer = this.add.sprite(21, 1097, 'computer');
+            this.door = this.add.sprite(710, wall_h - door.height + 68, 'door', 0);
+            this.door.z = 2;
+            this.door.animations.add('open', [1]);
+            this.door.animations.add('closed', [0]);
+
+            this.hands = {
+                left: this.add.sprite(200, 1523, 'hand_left'),
+                right: this.add.sprite(630, 1542, 'hand_right')
+            };
+
+            this.taskSheet = new Spacemaths.OfficeTaskSheet(this, this.answerClicked, this.paperMovedOut);
+
+            var sizes = Spacemaths.Utils.getInstance().getGameSizes();
+            this.shadow = new Phaser.Rectangle(0, 0, sizes.w, sizes.h);
+            this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+            //clock initialization here
+            this.clock.resetTimeOut(StageOffice.STAGE_LENGTH, this.timeIsOutCallback);
+            this.timer = this.game.time.create(false);
+            this.timer.loop(StageOffice.ENGINEER_WAIT_TIME, this.sendEngineer, this);
+            this.timer.start();
+        };
+        StageOffice.prototype.sendEngineer = function () {
+            this.timer.pause();
+            this.engineer.exists = true;
+            this.engineer.move_in();
+            this.door.play('open');
+        };
+        StageOffice.prototype.answerClicked = function (self, is_correct) {
+            if (is_correct)
+                self.correctAnswers++;
+            self.taskSheet.moveOut();
+        };
+        StageOffice.prototype.paperMovedOut = function (self) {
+            self.engineer.move_out();
+        };
+        StageOffice.prototype.timeIsOutCallback = function (self) {
+            self.isTimeOut = true;
+        };
+
+        /*render() {
+        
+        }*/
+        StageOffice.prototype.engineer_moved_in = function () {
+            var task = this.task_generator.generateTask();
+            this.taskSheet.loadTask(task);
+            this.taskSheet.moveIn();
+            /*console.log(JSON.stringify(task));
+            this.engineer.move_out();*/
+        };
+        StageOffice.prototype.engineer_moved_out = function () {
+            this.engineer.exists = false;
+
+            //this.isEngineerBusy = false;
+            this.door.play('closed');
+            this.picture.doShatter();
+            if (this.isTimeOut) {
+                this.timer.stop();
+                this.timer.removeAll();
+                this.timer.destroy();
+                console.log("Correct answers: " + this.correctAnswers);
+                this.game.transitions.to('StageLevelSelect');
+            } else {
+                this.timer.resume();
+            }
+        };
+        StageOffice.prototype.render = function () {
+        };
+        StageOffice.prototype.update = function () {
+            /*if (this.spaceKey.isDown && this.isEngineerBusy === false)
+            {
+            this.isEngineerBusy = true;
+            this.engineer.exists = true;
+            this.engineer.move_in();
+            this.door.play('open');
+            }*/
+        };
+        StageOffice.STAGE_LENGTH = 60000;
+        StageOffice.ENGINEER_WAIT_TIME = 500;
+        return StageOffice;
+    })(Phaser.State);
+    Spacemaths.StageOffice = StageOffice;
+})(Spacemaths || (Spacemaths = {}));
+var Spacemaths;
+(function (Spacemaths) {
+    var MainMenu = (function (_super) {
+        __extends(MainMenu, _super);
+        function MainMenu() {
+            _super.apply(this, arguments);
+        }
+        MainMenu.prototype.create = function () {
+            this.playButton = this.add.button(this.game.world.centerX, this.game.world.centerY, 'button_startgame', this.playClicked, this, 0, 1, 2);
+            this.playButton.anchor.setTo(0.5, 0.5);
+            /*this.background = this.add.sprite(0, 0, 'titlepage');
+            this.background.alpha = 0;
+            
+            this.logo = this.add.sprite(this.world.centerX, -300, 'logo');
+            this.logo.anchor.setTo(0.5, 0.5);
+            
+            this.add.tween(this.background).to({ alpha: 1 }, 2000, Phaser.Easing.Bounce.InOut, true);
+            this.add.tween(this.logo).to({ y: 220 }, 2000, Phaser.Easing.Elastic.Out, true, 2000);*/
+            //this.input.onDown.addOnce(this.fadeOut, this);
+        };
+        MainMenu.prototype.playClicked = function () {
+            this.fadeOut();
+        };
+        MainMenu.prototype.fadeOut = function () {
+            var tween = this.add.tween(this.playButton).to({ y: 0 }, 2000, Phaser.Easing.Linear.None, true);
+            tween.onComplete.add(this.startGame, this);
+        };
+        MainMenu.prototype.startGame = function () {
+            //this.game.state.start('StageOffice', true, false);
+            this.game.transitions.to('StageLevelSelect');
+        };
+        return MainMenu;
+    })(Phaser.State);
+    Spacemaths.MainMenu = MainMenu;
+})(Spacemaths || (Spacemaths = {}));
+var Spacemaths;
+(function (Spacemaths) {
+    var EngineerActionState;
+    (function (EngineerActionState) {
+        EngineerActionState[EngineerActionState["IDLE"] = 0] = "IDLE";
+        EngineerActionState[EngineerActionState["MOVE_IN"] = 1] = "MOVE_IN";
+        EngineerActionState[EngineerActionState["MOVE_OUT"] = 2] = "MOVE_OUT";
+    })(EngineerActionState || (EngineerActionState = {}));
+    ;
+
+    var Engineer = (function (_super) {
+        __extends(Engineer, _super);
+        function Engineer(game, x, y, move_in_callback, move_out_callback, stage_office) {
+            _super.call(this, game, x, y, 'engineer', 0);
+            this.action_state = 0 /* IDLE */;
+            this.move_in_coords = { x: 0, y: 0 };
+            this.move_out_coords = { x: 0, y: 0 };
+            this.move_epsylon = 5;
+            this.move_in_callback = move_in_callback;
+            this.move_out_callback = move_out_callback;
+            this.stage_office = stage_office;
+            this.anchor.setTo(0.5, 0.5);
+
+            /*this.game.physics.arcade.enableBody(this);*/
+            game.add.existing(this);
+
+            this.game.add.tween(this).to({ rotation: Math.PI / 50 }, 250, Phaser.Easing.Linear.None, true).to({ rotation: -Math.PI / 50 }, 250, Phaser.Easing.Linear.None, true).loop().start();
+        }
+        Engineer.prototype.update = function () {
+        };
+        Engineer.prototype.move_in = function () {
+            var tween = this.game.add.tween(this).to({
+                x: this.move_in_coords.x,
+                y: this.move_in_coords.y
+            }, 1000, Phaser.Easing.Linear.None, true);
+            tween.onComplete.add(this.move_in_callback, this.stage_office);
+        };
+        Engineer.prototype.move_out = function () {
+            var tween = this.game.add.tween(this).to({
+                x: this.move_out_coords.x,
+                y: this.move_out_coords.y
+            }, 1000, Phaser.Easing.Linear.None, true);
+            tween.onComplete.add(this.move_out_callback, this.stage_office);
+        };
+        Engineer.prototype.setMoveInXY = function (x, y) {
+            this.move_in_coords.x = x;
+            this.move_in_coords.y = y;
+        };
+        Engineer.prototype.setMoveOutXY = function (x, y) {
+            this.move_out_coords.x = x;
+            this.move_out_coords.y = y;
+        };
+        return Engineer;
+    })(Phaser.Sprite);
+    Spacemaths.Engineer = Engineer;
+})(Spacemaths || (Spacemaths = {}));
+var Spacemaths;
+(function (Spacemaths) {
     var Preloader = (function (_super) {
         __extends(Preloader, _super);
         function Preloader() {
             _super.apply(this, arguments);
         }
         Preloader.prototype.preload = function () {
+            var game = this.game;
+            game.transitions = this.game['plugins'].add(Phaser.Plugin.StateTransition);
+            game.transitions.settings({
+                duration: 1000,
+                properties: {
+                    alpha: 0,
+                    scale: {
+                        x: 1.5,
+                        y: 1.5
+                    }
+                }
+            });
+
             //  Set-up our preloader sprite
             var sizes = Spacemaths.Utils.getInstance().getGameSizes(), bar_img = this.game.cache.getImage('preloadBar'), cx = (sizes.w - bar_img.width) * 0.5, cy = (sizes.h - bar_img.height) * 0.5;
             this.preloadBar = this.add.sprite(cx, cy, 'preloadBar');
@@ -313,109 +566,25 @@ var Spacemaths;
             this.load.image('computer', 'assets/computer.png');
             this.load.image('door_back', 'assets/door_back.png');
             this.load.spritesheet('door', 'assets/door.png', 272, 650, 2);
+            this.load.spritesheet('button_startgame', 'assets/button_startgame.png', 579, 213, 3);
+            this.load.spritesheet('buttons_level', 'assets/buttons_level.png', 800, 400, 9);
             /*this.load.audio('music', 'assets/title.mp3', true);
             this.load.spritesheet('simon', 'assets/simon.png', 58, 96, 5);
             this.load.image('level1', 'assets/level1.png');*/
         };
 
         Preloader.prototype.create = function () {
-            var tween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+            var tween = this.add.tween(this.preloadBar).to({ alpha: -105 }, 1000, Phaser.Easing.Linear.None, true);
             tween.onComplete.add(this.startMainMenu, this);
         };
 
         Preloader.prototype.startMainMenu = function () {
-            //this.game.state.start('MainMenu', true, false);
-            this.game.state.start('StageOffice', true, false);
+            this.game.state.start('MainMenu', true, false);
+            //this.game.state.start('StageOffice', true, false);
         };
         return Preloader;
     })(Phaser.State);
     Spacemaths.Preloader = Preloader;
-})(Spacemaths || (Spacemaths = {}));
-var Spacemaths;
-(function (Spacemaths) {
-    var StageOffice = (function (_super) {
-        __extends(StageOffice, _super);
-        function StageOffice() {
-            _super.apply(this, arguments);
-            this.engineer_is_busy = false;
-            this.correctAnswers = 0;
-        }
-        StageOffice.prototype.create = function () {
-            this.task_generator = new Spacemaths.TaskGenerator;
-
-            var wall = this.game.cache.getImage('wall'), floor = this.game.cache.getImage('floor'), battery = this.game.cache.getImage('battery'), door = this.game.cache.getImage('door'), wall_h = wall.height, floor_h = floor.height;
-            this.background = {
-                wall: this.add.sprite(0, 0, 'wall'),
-                floor: this.add.sprite(0, wall_h, 'floor'),
-                table: this.add.sprite(0, wall_h + floor_h, 'table'),
-                battery: this.add.sprite(128, wall_h - battery.height, 'battery'),
-                door_back: this.add.sprite(710, wall_h - door.height + 68, 'door_back', 0)
-            };
-            this.picture = new Spacemaths.OfficePicture(this, 'wall_picture_frame', 'wall_picture', { x: 320, y: 241 }, 133);
-
-            this.clock = {
-                base: this.add.sprite(824, 1372, 'table_clock'),
-                //-217 из-за anchor.x == 1
-                arrow: this.add.sprite(824 + 217, 1372, 'table_clock_arrow')
-            };
-            this.clock.arrow.anchor.x = 1;
-
-            var eng = this.game.cache.getImage('engineer');
-            this.engineer = new Spacemaths.Engineer(this.game, 710, wall_h - eng.height, this.engineer_moved_in, this.engineer_moved_out, this);
-            this.engineer.exists = false;
-            this.engineer.z = 3;
-
-            this.computer = this.add.sprite(21, 1097, 'computer');
-            this.door = this.add.sprite(710, wall_h - door.height + 68, 'door', 0);
-            this.door.z = 2;
-            this.door.animations.add('open', [1]);
-            this.door.animations.add('closed', [0]);
-
-            this.hands = {
-                left: this.add.sprite(200, 1523, 'hand_left'),
-                right: this.add.sprite(630, 1542, 'hand_right')
-            };
-
-            this.taskSheet = new Spacemaths.OfficeTaskSheet(this, this.answerClicked, this.paperMovedOut);
-
-            var sizes = Spacemaths.Utils.getInstance().getGameSizes();
-            this.shadow = new Phaser.Rectangle(0, 0, sizes.w, sizes.h);
-            this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        };
-        StageOffice.prototype.answerClicked = function (self, is_correct) {
-            if (is_correct)
-                self.correctAnswers++;
-            self.taskSheet.moveOut();
-        };
-        StageOffice.prototype.paperMovedOut = function (self) {
-            self.engineer.move_out();
-        };
-        StageOffice.prototype.render = function () {
-        };
-        StageOffice.prototype.engineer_moved_in = function () {
-            var task = this.task_generator.generateTask();
-            this.taskSheet.loadTask(task);
-            this.taskSheet.moveIn();
-            /*console.log(JSON.stringify(task));
-            this.engineer.move_out();*/
-        };
-        StageOffice.prototype.engineer_moved_out = function () {
-            this.engineer.exists = false;
-            this.engineer_is_busy = false;
-            this.door.play('closed');
-            this.picture.doShatter();
-        };
-        StageOffice.prototype.update = function () {
-            if (this.spaceKey.isDown && this.engineer_is_busy === false) {
-                this.engineer_is_busy = true;
-                this.engineer.exists = true;
-                this.engineer.move_in();
-                this.door.play('open');
-            }
-        };
-        return StageOffice;
-    })(Phaser.State);
-    Spacemaths.StageOffice = StageOffice;
 })(Spacemaths || (Spacemaths = {}));
 var Spacemaths;
 (function (Spacemaths) {
@@ -438,19 +607,22 @@ var Spacemaths;
             return TaskGenerator.instance;
         };
         TaskGenerator.prototype.generateTask = function () {
-            var values = [Math.round(Math.random() * 50 + 1), Math.round(Math.random() * 50 + 1)], operation = Math.round(Math.random()), answers = [], correct_answer_index = Math.round(6 * Math.random() - 0.5);
+            var values = [Math.round(Math.random() * 50 + 1), Math.round(Math.random() * 50 + 1)], operation = Math.round(Math.random()), answers = [], correct_answer_index = Math.round(6 * Math.random() - 0.49);
+
+            switch (operation) {
+                case 0 /* Plus */:
+                    answers[correct_answer_index] = values[0] + values[1];
+                    break;
+                case 1 /* Minus */:
+                    answers[correct_answer_index] = values[0] - values[1];
+                    break;
+            }
+
             for (var i = 0; i < 6; i++) {
-                if (i == correct_answer_index) {
-                    switch (operation) {
-                        case 0 /* Plus */:
-                            answers[i] = values[0] + values[1];
-                            break;
-                        case 1 /* Minus */:
-                            answers[i] = values[0] - values[1];
-                            break;
-                    }
-                } else {
-                    answers[i] = Math.abs(Math.round(100 * Math.random()) - 50);
+                if (i != correct_answer_index) {
+                    do {
+                        answers[i] = Math.abs(Math.round(100 * Math.random()) - 50);
+                    } while(answers[i] == answers[correct_answer_index]);
                 }
             }
             return {

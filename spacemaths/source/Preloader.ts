@@ -2,6 +2,19 @@
     export class Preloader extends Phaser.State {
         preloadBar: Phaser.Sprite;
         preload() {
+            var game = <Game>this.game;
+            game.transitions = this.game['plugins'].add(Phaser.Plugin.StateTransition);
+            game.transitions.settings({
+                duration: 1000,
+                properties: {
+                    alpha: 0,
+                    scale: {
+                        x: 1.5,
+                        y: 1.5
+                    }
+                }
+            });
+
             //  Set-up our preloader sprite
             var sizes = Utils.getInstance().getGameSizes(),
                 bar_img = <HTMLImageElement>this.game.cache.getImage('preloadBar'),
@@ -25,19 +38,21 @@
             this.load.image('computer', 'assets/computer.png');
             this.load.image('door_back', 'assets/door_back.png');
             this.load.spritesheet('door', 'assets/door.png', 272, 650, 2);
+            this.load.spritesheet('button_startgame', 'assets/button_startgame.png', 579, 213, 3);
+            this.load.spritesheet('buttons_level', 'assets/buttons_level.png', 800, 400, 9);
             /*this.load.audio('music', 'assets/title.mp3', true);
             this.load.spritesheet('simon', 'assets/simon.png', 58, 96, 5);
             this.load.image('level1', 'assets/level1.png');*/
         }
  
         create() {
-            var tween = this.add.tween(this.preloadBar).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+            var tween = this.add.tween(this.preloadBar).to({ alpha: -105 }, 1000, Phaser.Easing.Linear.None, true);
             tween.onComplete.add(this.startMainMenu, this);
         }
  
         startMainMenu() {
-            //this.game.state.start('MainMenu', true, false);
-            this.game.state.start('StageOffice', true, false);
+            this.game.state.start('MainMenu', true, false);
+            //this.game.state.start('StageOffice', true, false);
         }
  
     }

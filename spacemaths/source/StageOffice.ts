@@ -31,6 +31,8 @@
         timer: Phaser.Timer;
 
         create() {
+            this.correctAnswers = 0;
+            this.isTimeOut = false;
             this.task_generator = new TaskGenerator;
             var wall = <HTMLImageElement>this.game.cache.getImage('wall'),
                 floor = <HTMLImageElement>this.game.cache.getImage('floor'),
@@ -48,17 +50,18 @@
             this.picture = new OfficePicture(this, 'wall_picture_frame', 'wall_picture', {x: 320, y: 241}, 133);
 
             this.clock = new OfficeClock(this, 'table_clock', 'table_clock_arrow', { x: 824, y: 1372 });
-            /*this.clock = {
-                base: this.add.sprite(824, 1372, 'table_clock'),
-                //-217 из-за anchor.x == 1
-                arrow: this.add.sprite(824 + 217, 1372, 'table_clock_arrow')
-            }
-            this.clock.arrow.anchor.x = 1;*/
 
-            var eng = <HTMLImageElement>this.game.cache.getImage('engineer');
-            this.engineer = new Engineer(this.game, 710, wall_h - eng.height, this.engineer_moved_in, this.engineer_moved_out, this);
+            var eng = <HTMLImageElement>this.game.cache.getImage('engineer'),
+                x = 710 + eng.width * 0.5,
+                y = wall_h - eng.height * 0.5;
+            this.engineer = new Engineer(this.game, x, y, this.engineer_moved_in, this.engineer_moved_out, this);
             this.engineer.exists = false;
             this.engineer.z = 3;
+            this.engineer.setMoveOutXY(x, y);
+            this.engineer.setMoveInXY(
+                this.game.world.centerX,
+                this.game.world.centerY - 0.5 * eng.height
+            );
 
             this.computer = this.add.sprite(21, 1097, 'computer');
             this.door = this.add.sprite(710, wall_h - door.height + 68, 'door', 0);
@@ -120,6 +123,8 @@
                 this.timer.stop();
                 this.timer.removeAll();
                 this.timer.destroy();
+                console.log("Correct answers: " + this.correctAnswers);
+                (<Game>this.game).transitions.to('StageLevelSelect');
             }
             else
             {
@@ -127,10 +132,7 @@
             }
         }
         render() {
-            if (this.isTimeOut)
-            {
-                this.game.debug.text('Correct answers: ' + this.correctAnswers, 32, 32);
-            }
+            
         }
         update() {
             /*if (this.spaceKey.isDown && this.isEngineerBusy === false)

@@ -7,6 +7,6 @@ G:\code\spacemaths\spacemaths\obj\Debug\spacemaths.pdb
 E:\GitHub\spacemaths\spacemaths\bin\spacemaths.dll.config
 E:\GitHub\spacemaths\spacemaths\bin\spacemaths.dll
 E:\GitHub\spacemaths\spacemaths\bin\spacemaths.pdb
-E:\GitHub\spacemaths\spacemaths\obj\Debug\spacemaths.csprojResolveAssemblyReference.cache
 E:\GitHub\spacemaths\spacemaths\obj\Debug\spacemaths.dll
 E:\GitHub\spacemaths\spacemaths\obj\Debug\spacemaths.pdb
+E:\GitHub\spacemaths\spacemaths\obj\Debug\spacemaths.csprojResolveAssemblyReference.cache

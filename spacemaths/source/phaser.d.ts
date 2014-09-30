@@ -3746,7 +3746,6 @@ declare module Phaser {
     }
 
     module Plugin {
-
         class AStar extends Phaser.Plugin {
 
             static VERSION: string;
@@ -3764,6 +3763,11 @@ declare module Phaser {
             isWalkable(x: number, y: number): boolean;
             setAStarMap(map: Phaser.Tilemap, layerName: string, tilesetName: string): Phaser.Plugin.AStar;
            
+        }
+
+        class StateTransition extends Phaser.Plugin {
+            public settings: (param: { duration: number; properties: Object; }) => void;
+            public to: (stateName: string) => void;
         }
 
         module AStar {

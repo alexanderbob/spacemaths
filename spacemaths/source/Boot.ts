@@ -47,7 +47,7 @@
             document.getElementById("content").style.overflow = "hidden";*/
 
 
-            this.game.physics.enable(this, Phaser.Physics.ARCADE);
+            //this.game.physics.enable(this, Phaser.Physics.ARCADE);
             this.game.state.start('Preloader', true, false);
 
             var self = this;
