@@ -1,9 +1,6 @@
 ﻿module Spacemaths {
 
     export class StageOffice extends Phaser.State {
-        private static STAGE_LENGTH = 60000;
-        private static ENGINEER_WAIT_TIME = 500;
-
         taskSheet: OfficeTaskSheet;
         picture: OfficePicture;
         clock: OfficeClock;
@@ -24,12 +21,10 @@
         computer: Phaser.Sprite;
         task_generator: TaskGenerator;
         //isEngineerBusy: boolean = false;
-        correctAnswers: number = 0;
         isTimeOut: boolean = false;
         timer: Phaser.Timer;
 
         create() {
-            this.correctAnswers = 0;
             this.isTimeOut = false;
             this.task_generator = TaskGenerator.getInstance();
             var wall = <HTMLImageElement>this.game.cache.getImage('wall'),
@@ -75,9 +70,9 @@
             this.taskSheet = new OfficeTaskSheet(this, this.answerClicked, this.paperMovedOut);
 
             //clock initialization here
-            this.clock.resetTimeOut(StageOffice.STAGE_LENGTH, this.timeIsOutCallback);
+            this.clock.resetTimeOut(Const.STAGE_OFFICE.STAGE_LENGTH, this.timeIsOutCallback);
             this.timer = this.game.time.create(false);
-            this.timer.loop(StageOffice.ENGINEER_WAIT_TIME, this.sendEngineer, this);
+            this.timer.loop(Const.STAGE_OFFICE.ENGINEER_WAIT_TIME, this.sendEngineer, this);
             this.timer.start();
         }
         sendEngineer() {
@@ -86,9 +81,8 @@
             this.engineer.move_in();
             this.door.play('open');
         }
-        answerClicked(self: StageOffice, is_correct: boolean) {
-            if (is_correct)
-                self.correctAnswers++;
+        answerClicked(self: StageOffice, data: EngineerTask, givenAnswerIndex: number) {
+            GameStorage.getInstance().pushAnswer(data, givenAnswerIndex);
             self.taskSheet.moveOut();
         }
         paperMovedOut(self: StageOffice) {
@@ -115,7 +109,6 @@
             if (this.isTimeOut)
             {
                 this.timer.stop();
-                console.log("Correct answers: " + this.correctAnswers);
                 (<Game>this.game).transitions.to('StageLevelSelect');
             }
             else

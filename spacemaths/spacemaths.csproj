@@ -56,6 +56,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="source\Boot.ts" />
+    <TypeScriptCompile Include="source\Const.ts" />
     <TypeScriptCompile Include="source\Declarations.ts" />
     <TypeScriptCompile Include="source\Game.ts" />
     <TypeScriptCompile Include="source\GameStorage.ts" />

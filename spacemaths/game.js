@@ -72,6 +72,27 @@ var Spacemaths;
 })(Spacemaths || (Spacemaths = {}));
 var Spacemaths;
 (function (Spacemaths) {
+    var Const = (function () {
+        function Const() {
+        }
+        Const.STAGE_OFFICE = {
+            STAGE_LENGTH: 60000,
+            ENGINEER_WAIT_TIME: 500
+        };
+
+        Const.LEVEL_DAYS = (function () {
+            var ret = [];
+            ret[0 /* Space */] = { min: 1, max: 3 };
+            ret[1 /* Moon */] = { min: 2, max: 4 };
+            ret[2 /* Mars */] = { min: 4, max: 7 };
+            return ret;
+        })();
+        return Const;
+    })();
+    Spacemaths.Const = Const;
+})(Spacemaths || (Spacemaths = {}));
+var Spacemaths;
+(function (Spacemaths) {
     (function (EngineerActionState) {
         EngineerActionState[EngineerActionState["IDLE"] = 0] = "IDLE";
         EngineerActionState[EngineerActionState["MOVE_IN"] = 1] = "MOVE_IN";
@@ -79,12 +100,12 @@ var Spacemaths;
     })(Spacemaths.EngineerActionState || (Spacemaths.EngineerActionState = {}));
     var EngineerActionState = Spacemaths.EngineerActionState;
     ;
-    (function (GameLevels) {
-        GameLevels[GameLevels["Space"] = 0] = "Space";
-        GameLevels[GameLevels["Moon"] = 1] = "Moon";
-        GameLevels[GameLevels["Mars"] = 2] = "Mars";
-    })(Spacemaths.GameLevels || (Spacemaths.GameLevels = {}));
-    var GameLevels = Spacemaths.GameLevels;
+    (function (GameLevel) {
+        GameLevel[GameLevel["Space"] = 0] = "Space";
+        GameLevel[GameLevel["Moon"] = 1] = "Moon";
+        GameLevel[GameLevel["Mars"] = 2] = "Mars";
+    })(Spacemaths.GameLevel || (Spacemaths.GameLevel = {}));
+    var GameLevel = Spacemaths.GameLevel;
     (function (MathOperation) {
         MathOperation[MathOperation["Plus"] = 0] = "Plus";
         MathOperation[MathOperation["Minus"] = 1] = "Minus";
@@ -165,15 +186,47 @@ var Spacemaths;
 })(Spacemaths || (Spacemaths = {}));
 var Spacemaths;
 (function (Spacemaths) {
+    var GameSessionData = (function () {
+        function GameSessionData(data) {
+            this._currentLevel = data.currentLevel;
+            this._currentDay = data.currentDay;
+            this._totalDays = data.totalDays;
+            this._correctAnswers = data.correctAnswers;
+            this._totalQuestions = data.totalQuestions;
+            this._wrongAnswers = data.wrongAnswers;
+        }
+        GameSessionData.prototype.getSessionData = function () {
+            return {
+                correctAnswers: this._correctAnswers,
+                currentDay: this._currentDay,
+                currentLevel: this._currentLevel,
+                totalDays: this._totalDays,
+                totalQuestions: this._totalQuestions,
+                wrongAnswers: this._wrongAnswers
+            };
+        };
+        GameSessionData.prototype.wrongAnswersCount = function () {
+            return this._wrongAnswers;
+        };
+        GameSessionData.prototype.pushAnswer = function (task, givenAnswerIndex) {
+            this._totalQuestions++;
+            if (givenAnswerIndex == task.correct_answer_index) {
+                this._correctAnswers++;
+            } else {
+                this._wrongAnswers.push({ task: task, givenAnswerIndex: givenAnswerIndex });
+            }
+        };
+        return GameSessionData;
+    })();
+    Spacemaths.GameSessionData = GameSessionData;
+})(Spacemaths || (Spacemaths = {}));
+var Spacemaths;
+(function (Spacemaths) {
     var GameStorage = (function () {
         function GameStorage() {
             if (GameStorage.self === null) {
                 GameStorage.self = this;
-                this.levelAccess = [];
-                this.levelAccess[0 /* Space */] = true;
-                this.levelAccess[1 /* Moon */] = false;
-                this.levelAccess[2 /* Mars */] = false;
-                this.loadData();
+                this.initialLoad();
             }
         }
         GameStorage.getInstance = function () {
@@ -185,6 +238,45 @@ var Spacemaths;
         GameStorage.prototype.hasLevelAccess = function (level) {
             return this.levelAccess[level];
         };
+        GameStorage.prototype.getSessionData = function () {
+            return this.sessionData;
+        };
+        GameStorage.prototype.saveSessionData = function () {
+            this.save(GameStorage.KEY_GAME_SESSION, this.sessionData);
+        };
+
+        GameStorage.prototype.initialLoad = function () {
+            //load level access
+            var data = this.load(GameStorage.KEY_LEVEL_ACCESS);
+            if (data) {
+                this.levelAccess = data;
+            } else {
+                this.levelAccess = [];
+                this.levelAccess[0 /* Space */] = true;
+                this.levelAccess[1 /* Moon */] = false;
+                this.levelAccess[2 /* Mars */] = false;
+                this.save(GameStorage.KEY_LEVEL_ACCESS, this.levelAccess);
+                //localStorage.setItem(GameStorage.KEY_LEVEL_ACCESS, JSON.stringify(this.levelAccess));
+            }
+
+            //load last game session data to continue playing
+            data = this.load(GameStorage.KEY_GAME_SESSION); //localStorage.getItem(GameStorage.KEY_GAME_SESSION);
+            if (data) {
+                this.sessionData = data; //JSON.parse(data);
+            } else {
+                this.sessionData = {
+                    correctAnswers: 0,
+                    currentDay: 0,
+                    currentLevel: 0 /* Space */,
+                    totalDays: 0,
+                    totalQuestions: 0,
+                    wrongAnswers: []
+                };
+
+                //localStorage.setItem(GameStorage.KEY_GAME_SESSION, JSON.stringify(this.sessionData));
+                this.save(GameStorage.KEY_GAME_SESSION, this.sessionData);
+            }
+        };
         GameStorage.prototype.save = function (key, value) {
             localStorage.setItem(key, (typeof value).toLowerCase() === 'object' ? JSON.stringify(value) : value);
         };
@@ -195,17 +287,8 @@ var Spacemaths;
             }
             return d;
         };
-
-        GameStorage.prototype.loadData = function () {
-            var data = localStorage.getItem(GameStorage.KEY_LEVEL_ACCESS);
-            if (data) {
-                this.levelAccess = JSON.parse(data);
-            } else {
-                localStorage.setItem(GameStorage.KEY_LEVEL_ACCESS, JSON.stringify(this.levelAccess));
-            }
-        };
         GameStorage.KEY_LEVEL_ACCESS = 'levelAccess';
-        GameStorage.KEY_GAME_STATE = 'gameSessionState';
+        GameStorage.KEY_GAME_SESSION = 'gameSessionData';
 
         GameStorage.self = null;
         return GameStorage;
@@ -366,7 +449,8 @@ var Spacemaths;
                 text = this.stage.game.add.text(x, y, data.answers[i].toString(), this.style, this.group);
                 text.inputEnabled = true;
                 text.events.onInputDown.addOnce(this.answerClickHandler, this);
-                text['smIsCorrectAnswer'] = i == data.correct_answer_index;
+                text.isCorrectAnswer = i == data.correctAnswerIndex;
+                text.questionData = data;
             }
             this.group.setAll('anchor.x', 0.5);
             this.group.setAll('anchor.y', 0.5);
@@ -388,7 +472,7 @@ var Spacemaths;
         OfficeTaskSheet.prototype.answerClickHandler = function (clickedText) {
             //true -> correct answer,
             //false -> wrong answer
-            this.answerClicked(this.stage, clickedText['smIsCorrectAnswer']);
+            this.answerClicked(this.stage, clickedText.questionData, clickedText.isCorrectAnswer);
         };
 
         OfficeTaskSheet.prototype.clearTask = function () {
@@ -517,20 +601,29 @@ var Spacemaths;
 
         StageLevelSelect.prototype.selectSpace = function () {
             //(<Game>this.game).transitions.to('StageOffice');
-            this.startStage();
+            this.startStage(0 /* Space */);
         };
 
         StageLevelSelect.prototype.selectMoon = function () {
             //(<Game>this.game).transitions.to('StageOffice');
-            this.startStage();
+            this.startStage(1 /* Moon */);
         };
 
         StageLevelSelect.prototype.selectMars = function () {
             //(<Game>this.game).transitions.to('StageOffice');
-            this.startStage();
+            this.startStage(2 /* Mars */);
         };
 
-        StageLevelSelect.prototype.startStage = function () {
+        StageLevelSelect.prototype.startStage = function (level) {
+            var sessionData = {
+                correctAnswers: 0,
+                currentDay: 0,
+                currentLevel: level,
+                totalDays: this.game.rnd.integerInRange(Spacemaths.Const.LEVEL_DAYS[level].min, Spacemaths.Const.LEVEL_DAYS[level].max),
+                totalQuestions: 0,
+                wrongAnswers: []
+            };
+
             this.stage.game.add.tween(this.button_space).to({
                 x: -this.button_space.width
             }, 500, Phaser.Easing.Linear.None, true);
@@ -596,9 +689,9 @@ var Spacemaths;
             this.taskSheet = new Spacemaths.OfficeTaskSheet(this, this.answerClicked, this.paperMovedOut);
 
             //clock initialization here
-            this.clock.resetTimeOut(StageOffice.STAGE_LENGTH, this.timeIsOutCallback);
+            this.clock.resetTimeOut(Spacemaths.Const.STAGE_OFFICE.STAGE_LENGTH, this.timeIsOutCallback);
             this.timer = this.game.time.create(false);
-            this.timer.loop(StageOffice.ENGINEER_WAIT_TIME, this.sendEngineer, this);
+            this.timer.loop(Spacemaths.Const.STAGE_OFFICE.ENGINEER_WAIT_TIME, this.sendEngineer, this);
             this.timer.start();
         };
         StageOffice.prototype.sendEngineer = function () {
@@ -607,8 +700,8 @@ var Spacemaths;
             this.engineer.move_in();
             this.door.play('open');
         };
-        StageOffice.prototype.answerClicked = function (self, is_correct) {
-            if (is_correct)
+        StageOffice.prototype.answerClicked = function (self, data, isCorrect) {
+            if (isCorrect)
                 self.correctAnswers++;
             self.taskSheet.moveOut();
         };
@@ -656,8 +749,6 @@ var Spacemaths;
         };
         StageOffice.prototype.shutdown = function () {
         };
-        StageOffice.STAGE_LENGTH = 60000;
-        StageOffice.ENGINEER_WAIT_TIME = 500;
         return StageOffice;
     })(Phaser.State);
     Spacemaths.StageOffice = StageOffice;

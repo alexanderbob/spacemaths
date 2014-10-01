@@ -8,8 +8,8 @@
         create() {
             var height = this.game.world.height,
                 storage = GameStorage.getInstance(),
-                isMoonEnabled = storage.hasLevelAccess(GameLevels.Moon),
-                isMarsEnabled = storage.hasLevelAccess(GameLevels.Mars);
+                isMoonEnabled = storage.hasLevelAccess(GameLevel.Moon),
+                isMarsEnabled = storage.hasLevelAccess(GameLevel.Mars);
 
             this.button_space = this.add.button(
                 this.game.world.centerX, 0.1 * height,
@@ -53,20 +53,31 @@
 
         private selectSpace() {
             //(<Game>this.game).transitions.to('StageOffice');
-            this.startStage();
+            this.startStage(GameLevel.Space);
         }
 
         private selectMoon() {
             //(<Game>this.game).transitions.to('StageOffice');
-            this.startStage();
+            this.startStage(GameLevel.Moon);
         }
 
         private selectMars() {
             //(<Game>this.game).transitions.to('StageOffice');
-            this.startStage();
+            this.startStage(GameLevel.Mars);
         }
 
-        private startStage() {
+        private startStage(level: GameLevel) {
+            var gs = GameStorage.getInstance();
+            gs.setSessionData({
+                correctAnswers: 0,
+                currentDay: 0,
+                currentLevel: level,
+                totalDays: this.game.rnd.integerInRange(Const.LEVEL_DAYS[level].min, Const.LEVEL_DAYS[level].max),
+                totalQuestions: 0,
+                wrongAnswers: []
+            });
+            gs.saveSessionData();
+
             this.stage.game.add.tween(this.button_space).to({
                 x: -this.button_space.width
             }, 500, Phaser.Easing.Linear.None, true);

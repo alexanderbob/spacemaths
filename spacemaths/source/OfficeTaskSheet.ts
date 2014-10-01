@@ -3,7 +3,7 @@
         private group: Phaser.Group;
         private stage: StageOffice;
         private style: Object;
-        private answerClicked: (office: StageOffice, correct: boolean) => void;
+        private answerClicked: TaskSheetAnswerClicked;
         private paperMovedOut: Function;
         private paper_size: { w: number; h: number; };
 
@@ -47,16 +47,17 @@
                 -half_h + 0.1 * this.paper_size.h,
                 str, this.style, this.group);
 
-            var x: number, y: number, text: Phaser.Text,
+            var x: number, y: number, text: OfficeTaskSheetText,
                 fs = OfficeTaskSheet.FONT_SIZE;
             for (var i in data.answers)
             {
                 x = -0.5 * half_w + half_w * (i & 1);
                 y = -fs + ((i > 1) ? (i > 3) ? 4 * fs : 2 * fs : 0);
-                text = this.stage.game.add.text(x, y, data.answers[i].toString(), this.style, this.group);
+                text = (<OfficeTaskSheetText>this.stage.game.add.text(x, y, data.answers[i].toString(), this.style, this.group));
                 text.inputEnabled = true;
                 text.events.onInputDown.addOnce(this.answerClickHandler, this);
-                text['smIsCorrectAnswer'] = i == data.correct_answer_index;
+                text.answerIndex = i;
+                text.questionData = data;
             }
             this.group.setAll('anchor.x', 0.5);
             this.group.setAll('anchor.y', 0.5);
@@ -78,10 +79,10 @@
                 .onComplete.add(this.moveOutCallback, this);
         }
 
-        private answerClickHandler(clickedText: Phaser.Text) {
+        private answerClickHandler(clickedText: OfficeTaskSheetText) {
             //true -> correct answer,
             //false -> wrong answer
-            this.answerClicked(this.stage, clickedText['smIsCorrectAnswer']);
+            this.answerClicked(this.stage, clickedText.questionData, clickedText.answerIndex);
         }
 
         private clearTask() {
